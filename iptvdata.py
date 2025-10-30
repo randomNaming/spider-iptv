@@ -360,7 +360,10 @@ def creat_iptvs():
                         # print(f"{current_time} 频道地址重复或无效：{name},{url}")
                         continue
                 
-                print(f"{current_time} 频道名称{chl_id}：{chl_name}，有效源数量：{number}")
+                if channels:
+                    print(f"{current_time} 频道ID{channels[0][2]}，频道名称{chl_name}，有效源数量：{number}")
+                else:
+                    print(f"{current_time} 频道名称{chl_name}，无有效直播源")
                 
                 if len(update_list) > 0:
                     # 执行批量更新
