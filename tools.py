@@ -66,8 +66,41 @@ class Tools (object) :
             
     # 检查URL的有效性
     def check_url(self, url):
+        original_url = url
+        fixed_url = url
+        check_type = ''
+        result_detail = ''
+        is_valid = False
         timeout = 3
-        return self.valid_url(url, timeout)
+
+        # 若是以 rtp/udp协议打头，才做socket端口检测
+        proto_head = re.match(r'^(?:/)?(rtp|udp)[/:]{1,2}(\\d+\\.\\d+\\.\\d+\\.\\d+:\\d{1,5})$', url, re.IGNORECASE)
+        proto_url = re.match(r'^(rtp|udp)://(\\d+\\.\\d+\\.\\d+\\.\\d+:\\d{1,5})$', url, re.IGNORECASE)
+
+        if proto_head or proto_url:
+            # 只要不是http(s)打头，是rtp/udp单独协议地址，就修正标准
+            ipport_str = (proto_head or proto_url).group(2)
+            fixed_url = f"{(proto_head or proto_url).group(1).lower()}://{ipport_str}"
+            check_type = 'SOCKET'
+            ip, port = ipport_str.split(':')
+            port = int(port)
+            try:
+                with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+                    sock.settimeout(timeout)
+                    sock.connect((ip, port))
+                    is_valid = True
+                    result_detail = f"UDP {ip}:{port} 端口连通"
+            except Exception as e:
+                is_valid = False
+                result_detail = f"UDP {ip}:{port} 端口不可达, 异常: {e}"
+        else:
+            # 其它一律认为是HTTP检测（包括http://.../rtp/xxx 这种）
+            check_type = 'HTTP'
+            is_valid = self.valid_url(url, timeout)
+            result_detail = f"HTTP状态: {'有效' if is_valid else '无效'}"
+
+        logger.info(f"检测协议地址 | 原始输入: {original_url} | 修正检测: {fixed_url} | 检测方式: {check_type} | 检测结果: {'有效' if is_valid else '无效'} | 详情: {result_detail}")
+        return is_valid
     
     # 验证URL的有效性
     def valid_url(self, url, timeout):
