@@ -77,44 +77,57 @@ def run_scripts():
     
     for script in scripts:
         if os.path.exists(script):
-            print(f"执行脚本: {script}")
+            print(f"\n{'='*60}")
+            print(f"正在执行脚本: {script}")
+            print(f"{'='*60}")
             try:
+                # 实时输出日志，不捕获到内存
                 result = subprocess.run([sys.executable, script], 
-                                      capture_output=True, text=True, timeout=3600)
+                                      timeout=3600)
                 if result.returncode == 0:
-                    print(f"{script} 执行成功")
+                    print(f"\n✓ {script} 执行成功")
                 else:
-                    print(f"{script} 执行失败: {result.stderr}")
+                    print(f"\n✗ {script} 执行失败，退出码: {result.returncode}")
             except subprocess.TimeoutExpired:
-                print(f"{script} 执行超时")
+                print(f"\n✗ {script} 执行超时（超过1小时）")
+            except KeyboardInterrupt:
+                print(f"\n⚠ {script} 被用户中断")
+                break
             except Exception as e:
-                print(f"{script} 执行异常: {e}")
+                print(f"\n✗ {script} 执行异常: {e}")
         else:
-            print(f"脚本不存在: {script}")
+            print(f"⚠ 脚本不存在: {script}")
 
 def main():
     """主函数"""
-    print("=" * 50)
+    print("=" * 60)
     print("IPTV项目启动脚本")
-    print("=" * 50)
+    print("=" * 60)
     
     # 加载环境变量
     load_env_file()
     
     # 检查依赖
+    print("\n步骤1: 检查依赖包...")
     if not check_dependencies():
+        print("❌ 依赖检查失败，程序退出")
         sys.exit(1)
+    print("✅ 依赖检查通过")
     
     # 检查数据库
+    print("\n步骤2: 检查数据库连接...")
     if not check_database():
+        print("❌ 数据库连接失败，程序退出")
         sys.exit(1)
+    print("✅ 数据库连接正常")
     
     # 运行脚本
+    print("\n步骤3: 开始执行IPTV脚本...")
     run_scripts()
     
-    print("=" * 50)
-    print("IPTV项目执行完成")
-    print("=" * 50)
+    print("\n" + "=" * 60)
+    print("🎉 IPTV项目执行完成")
+    print("=" * 60)
 
 if __name__ == "__main__":
     main()

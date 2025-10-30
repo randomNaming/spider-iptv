@@ -129,9 +129,11 @@ def process_scan_ip(data_queue, thread_id):
     current_time = datetime.now()
     # 获取工具类
     T = tools.Tools()
-    print(f"{current_time} 第{thread_id + 1}个队列开始处理数据，队列中数据量：{data_queue.qsize()}")
+    queue_size = data_queue.qsize()
+    print(f"{current_time} 第{thread_id + 1}个队列开始处理数据，队列中数据量：{queue_size}")
     # 有效列表
     hotel_list = []
+    processed_count = 0
     # 遍历查询结果
     while not data_queue.empty():
         # 获取后将数据从队列中移除
@@ -167,6 +169,7 @@ def process_scan_ip(data_queue, thread_id):
                 
                 # 检测是否有效
                 ip_port = ip + ":" + str(port)
+                print(f"正在检测 {ip_port} 的播放速度...")
                 test_url = "http://" + ip_port + "/tsfile/live/0003_1.m3u8?key=txiptv"
                 speed = T.get_ffmpeg_speed(test_url)
                 test_url = "http://" + ip_port + "/tsfile/live/0006_1.m3u8?key=txiptv"
@@ -192,6 +195,12 @@ def process_scan_ip(data_queue, thread_id):
                 # 关闭游标和连接
                 cursor.close()
                 cnx.close()
+        
+        # 更新处理进度
+        processed_count += 1
+        if processed_count % 10 == 0:  # 每处理10个IP显示一次进度
+            remaining = data_queue.qsize()
+            print(f"{current_time} 第{thread_id + 1}个队列进度: 已处理{processed_count}个，剩余{remaining}个")
 
 def gyssi_hotels():
     # 获取当前时间
@@ -722,6 +731,10 @@ def main_function():
     # 判断当前日期的星期几（星期：1-7）
     weekday = current_time.weekday() + 1
     hour = current_time.hour
+    
+    print(f"{current_time} 开始执行酒店源处理程序")
+    print(f"当前时间：周{weekday}，小时：{hour}")
+    
     try:
         # 从连接池获取连接
         cnx = connection_pool.get_connection()
@@ -731,14 +744,26 @@ def main_function():
         # 1/ 爬取酒店资源
         # internet_hotels()
         if weekday%2 == 1:
+            print(f"\n{'='*50}")
             print(f"{current_time} 当前时间：周{weekday}，执行资源下载")
+            print(f"{'='*50}")
             gyssi_hotels()
+        else:
+            print(f"{current_time} 当前时间：周{weekday}，跳过资源下载")
         
         # 2/扫描酒店资源
+        print(f"\n{'='*50}")
+        print(f"{current_time} 开始扫描酒店资源")
+        print(f"{'='*50}")
         sweep_hotels()
         
         # 3/解析酒店资源
+        print(f"\n{'='*50}")
+        print(f"{current_time} 开始解析酒店资源")
+        print(f"{'='*50}")
         parse_hotels()
+        
+        print(f"\n{current_time} 酒店源处理程序执行完成")
         
     except mysql.connector.Error as e:
         print(f"{current_time} 执行数据库操作时, 发生异常: {str(e)}")
