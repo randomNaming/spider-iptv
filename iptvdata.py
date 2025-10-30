@@ -211,7 +211,7 @@ def internet_lives():
         cnx.commit()
         
         # 打开包含数据的文件
-        with open(file_path, 'r') as file:
+        with open(file_path, 'r', encoding='utf-8', errors='ignore') as file:
             number = 0
             # 信任频道
             sign = 0
@@ -302,8 +302,9 @@ def creat_iptvs():
         # 创建游标对象
         cursor = cnx.cursor()
         
-        # 查询频道分类
-        query_category = "SELECT type FROM iptv_category WHERE enable = 1 GROUP BY type ORDER BY id;"
+        # 查询频道分类（兼容 ONLY_FULL_GROUP_BY）
+        # 使用 MIN(id) 排序，避免按未分组列排序导致的 SQL 错误
+        query_category = "SELECT type FROM iptv_category WHERE enable = 1 GROUP BY type ORDER BY MIN(id);"
         cursor.execute(query_category)
         categories = cursor.fetchall()
 
@@ -376,7 +377,7 @@ def creat_iptvs():
         output_file = base_source + 'iptv.txt'
         
         # txt格式写入
-        with open(output_file, 'w') as f:
+        with open(output_file, 'w', encoding='utf-8') as f:
             f.write(result_pub)
         print(f"IPTV数据文件已生成：{output_file}")
         

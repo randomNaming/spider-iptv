@@ -294,7 +294,7 @@ class Tools (object) :
         # 转换处理
         m3u_output = None
         current_group = None
-        with open(txt_file, 'r') as file:
+        with open(txt_file, 'r', encoding='utf-8', errors='ignore') as file:
             lines = file.readlines()
             m3u_output = '#EXTM3U x-tvg-url="https://live.fanmingming.com/e.xml"\n'
             for line in lines:
@@ -309,7 +309,7 @@ class Tools (object) :
                             m3u_output += f' group-title="{current_group}"'
                         m3u_output += f',{original_channel_name}\n{channel_link}\n'
         
-        with open(m3u_file, 'w') as file:
+        with open(m3u_file, 'w', encoding='utf-8') as file:
             file.write(m3u_output)
             
         print(f"文件{txt_file} 已成功转换为：{m3u_file}")
@@ -322,7 +322,7 @@ class Tools (object) :
         # 转换处理
         m3u_output = None
         current_group = None
-        with open(txt_file, 'r') as file:
+        with open(txt_file, 'r', encoding='utf-8', errors='ignore') as file:
             lines = file.readlines()
             m3u_output = '#EXTM3U x-tvg-url="https://live.fanmingming.com/e.xml"\n'
             last_channel_name = None
@@ -343,7 +343,7 @@ class Tools (object) :
                             m3u_output += f',{original_channel_name}\n{channel_link}\n'
                         last_channel_name = original_channel_name
         
-        with open(m3u_file, 'w') as file:
+        with open(m3u_file, 'w', encoding='utf-8') as file:
             file.write(m3u_output)
             
         print(f"文件{txt_file} 已成功转换为：{m3u_file}")
@@ -356,7 +356,8 @@ class Tools (object) :
         # 转换处理
         txt_output = ""
         current_group = None
-        with open(m3u_file, 'r') as file:
+        # 尝试以UTF-8读取，忽略非法字节，避免Windows默认GBK导致的解码异常
+        with open(m3u_file, 'r', encoding='utf-8', errors='ignore') as file:
             lines = file.readlines()
             group_title = None
             for line in lines:
@@ -377,7 +378,7 @@ class Tools (object) :
                     else:
                         txt_output += f"{channel_name},{channel_link}\n"
         
-        with open(txt_file, 'w') as file:
+        with open(txt_file, 'w', encoding='utf-8') as file:
             file.write(txt_output)
             
         print(f"文件{m3u_file} 已成功转换为：{txt_file}")

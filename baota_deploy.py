@@ -164,7 +164,7 @@ def create_cron_job():
         else:
             new_cron = cron_cmd
         
-        with open("/tmp/iptv_cron", "w") as f:
+        with open("/tmp/iptv_cron", "w", encoding="utf-8") as f:
             f.write(new_cron)
         
         run_command("crontab /tmp/iptv_cron", check=False)

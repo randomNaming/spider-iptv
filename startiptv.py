@@ -91,7 +91,7 @@ def sichuan_multicast():
                 continue
             result_txt += f"{name},rtp://{ip_port}\n"
         
-        with open(file_path, 'w') as f:
+        with open(file_path, 'w', encoding='utf-8') as f:
             f.write(result_txt)
         print(f"IPTV数据文件已生成：{file_path}")
 

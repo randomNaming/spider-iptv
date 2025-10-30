@@ -260,7 +260,7 @@ def gyssi_hotels():
                 base_file = T.convertToTxt(base_file)
                 
                 # 读取文件内容
-                with open(base_file, 'r') as file:
+                with open(base_file, 'r', encoding='utf-8', errors='ignore') as file:
                     for line in file:
                         # 获取当前时间
                         current_time = datetime.now()

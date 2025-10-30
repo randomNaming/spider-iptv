@@ -331,7 +331,7 @@ def multicast_channel():
                 speed = 0.00
                 sum_speed = 0.00
                 # 打开包含数据的文件
-                with open(file_path, 'r') as file:
+                with open(file_path, 'r', encoding='utf-8', errors='ignore') as file:
                     data_list = []
                     number = 0
                     for i, line in enumerate(file):
@@ -444,7 +444,7 @@ def multicast_channel():
                 speed = 0.00
                 sum_speed = 0.00
                 # 打开包含数据的文件
-                with open(file_path, 'r') as file:
+                with open(file_path, 'r', encoding='utf-8', errors='ignore') as file:
                     data_list = []
                     number = 0
                     for i, line in enumerate(file):
