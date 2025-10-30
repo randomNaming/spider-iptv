@@ -1,0 +1,48 @@
+# Python cache and bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment files
+.env
+.env.*
+
+# Packaging / build
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Coverage / test caches
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.pytest_cache/
+.mypy_cache/
+
+# IDE / editor
+.vscode/
+.idea/
+*.iml
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Project specific generated artifacts
+source/iptv.txt
+
+# Local helper scripts (not required in production)
+test_config.py
+
+

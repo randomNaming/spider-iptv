@@ -10,6 +10,7 @@ import subprocess
 import tools
 import urllib.parse
 import mysql.connector
+import config
 from queue import Queue
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
@@ -22,14 +23,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 T = tools.Tools()
 
 # 创建连接池
-connection_pool = mysql.connector.pooling.MySQLConnectionPool(
-    pool_name="iptv_pool",
-    pool_size=10,
-    host='192.168.199.119',
-    user='iptv',
-    password='iptv',
-    database='iptv'
-)
+db_config = config.config.get_db_config()
+connection_pool = mysql.connector.pooling.MySQLConnectionPool(**db_config)
 
 def process_hotels(data_list):
     # 获取当前时间

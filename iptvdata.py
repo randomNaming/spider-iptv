@@ -7,20 +7,15 @@ import m3u8
 import requests
 import numpy as np
 import tools
+import config
 from queue import Queue
 from datetime import datetime, timedelta
 from timeout_decorator import timeout, TimeoutError
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # 创建连接池
-connection_pool = mysql.connector.pooling.MySQLConnectionPool(
-    pool_name="iptv_pool",
-    pool_size=10,
-    host='192.168.199.119',
-    user='iptv',
-    password='iptv',
-    database='iptv'
-)
+db_config = config.config.get_db_config()
+connection_pool = mysql.connector.pooling.MySQLConnectionPool(**db_config)
 
 def process_channels(data_list):
     # 获取当前时间

@@ -9,6 +9,7 @@ import tools
 import urllib.parse
 import urllib.request
 import mysql.connector
+import config
 from bs4 import BeautifulSoup
 from datetime import datetime
 from urllib.parse import urlparse
@@ -16,14 +17,8 @@ from mysql.connector import pooling
 from requests.exceptions import RequestException
 
 # 创建连接池
-connection_pool = mysql.connector.pooling.MySQLConnectionPool(
-    pool_name="iptv_pool",
-    pool_size=10,
-    host='192.168.199.119',
-    user='iptv',
-    password='iptv',
-    database='iptv'
-)
+db_config = config.config.get_db_config()
+connection_pool = mysql.connector.pooling.MySQLConnectionPool(**db_config)
 
 def process_channels(data_list):
     # 获取当前时间
@@ -110,7 +105,8 @@ def multicast_udpxy():
     T = tools.Tools()
     # 调用360网络测绘接口
     api_url="https://quake.360.net/api/v3/search/quake_service"
-    api_token="你自己https://quake.360.net的token"
+    api_config = config.config.get_api_config()
+    api_token = api_config['quake_token']
     
     try:
         # 从连接池获取连接
