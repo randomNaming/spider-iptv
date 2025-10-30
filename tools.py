@@ -25,7 +25,25 @@ from urllib.parse import urlparse
 from concurrent.futures import ThreadPoolExecutor
 from mysql.connector import pooling
 from requests.exceptions import RequestException
+import logging
 socket.setdefaulttimeout(5.0)
+
+# 日志配置段：自定义Handler，保证utf-8和中文支持
+class Utf8Formatter(logging.Formatter):
+    def format(self, record):
+        s = super().format(record)
+        return s.encode('utf-8', errors='ignore').decode('utf-8', errors='ignore')
+
+logger = logging.getLogger("iptv_check")
+if not logger.handlers:
+    log_dir = 'logs'
+    os.makedirs(log_dir, exist_ok=True)
+    log_path = os.path.join(log_dir, f"iptv_check_{datetime.now().strftime('%Y%m%d')}.log")
+    handler = logging.FileHandler(log_path, encoding='utf-8')
+    fmt = Utf8Formatter('[%(asctime)s][%(levelname)s][%(message)s]')
+    handler.setFormatter(fmt)
+    logger.setLevel(logging.INFO)
+    logger.addHandler(handler)
 
 class Tools (object) :
 
@@ -55,8 +73,15 @@ class Tools (object) :
     def valid_url(self, url, timeout):
         try:
             response = requests.get(url, stream=True, timeout=timeout)
+            sbody = ''
+            try:
+                sbody = response.text[:200].replace('\n','') if response.text else ''
+            except Exception as e:
+                sbody = f'无法获取响应文本: {e}'
+            logger.info(f'检测URL: {url} | 超时: {timeout} | 状态: {response.status_code} | 响应前200字: {sbody}')
             return response.status_code == 200
-        except RequestException:
+        except requests.RequestException as e:
+            logger.warning(f'检测URL失败: {url} | 超时: {timeout} | 错误: {e}')
             return False
 
     # 检查IPTV的有效性
