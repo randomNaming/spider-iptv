@@ -30,6 +30,7 @@ class Config:
         # API配置
         self.API_CONFIG = {
             'quake_token': os.getenv('QUAKE_TOKEN', ''),
+            'hotels_token': os.getenv('HOTELS_TOKEN', ''),
             'timeout': 30
         }
         

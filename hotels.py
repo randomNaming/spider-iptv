@@ -221,17 +221,25 @@ def gyssi_hotels():
         # 定义下载m3u地址省份
         province_names = ["上海市", "云南省", "内蒙古自治区", "北京市", "吉林省", "四川省", "安徽省", "山东省", "山西省", "广东省", "广西壮族自治区", "江苏省", "江西省", "河北省", "河南省", "浙江省", "海南省", "湖北省", "湖南省", "福建省", "辽宁省", "重庆市", "陕西省", "黑龙江省"]
         # M3U基础页面的 URL https://gyssi.link/login.html
-        token_url = 'https://gyssi.link/iptv/jwt.html'
         base_url = 'https://gyssi.link/iptv/chinaiptv/'
         
-        token_response = T.request_body(token_url)
-        # 检查请求是否成功
-        token_content = token_response.text
-        # 使用BeautifulSoup解析网页内容
-        token_soup = BeautifulSoup(token_content, "html.parser")
-        # 查找所有class为"result"的<div>标签
-        # 获取 id 为 "token" 的元素的值
-        token = token_soup.find(id="token").text
+        # 先尝试从环境变量获取token
+        api_config = config.config.get_api_config()
+        token = api_config.get('hotels_token', '')
+        
+        # 如果环境变量中没有token，则从网页动态获取
+        if not token:
+            token_url = 'https://gyssi.link/iptv/jwt.html'
+            token_response = T.request_body(token_url)
+            # 检查请求是否成功
+            token_content = token_response.text
+            # 使用BeautifulSoup解析网页内容
+            token_soup = BeautifulSoup(token_content, "html.parser")
+            # 获取 id 为 "token" 的元素的值
+            token = token_soup.find(id="token").text
+            print(f"{current_time} 从网页动态获取token: {token}")
+        else:
+            print(f"{current_time} 使用环境变量中的token")
         
         number = 0
         # 初始化酒店集合
